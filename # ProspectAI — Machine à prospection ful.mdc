@@ -1,0 +1,257 @@
+# ProspectAI — Machine à prospection full-pipeline
+
+**TL;DR** — Application Next.js + Prisma + SQLite local déployée sur Vercel, orchestrant un pipeline complet : scraping multi-sources (Google Places, Pappers, PagesJaunes, LinkedIn, Google Search) → analyse automatique (site, SEO, fiche Google, réseaux sociaux) → scoring & dashboard avec filtres → génération de site pour prospects sans présence web (deploy Vercel HITL) → génération d'email personnalisé via Gemini → validation humaine → envoi via Nodemailer SMTP. Le projet réutilise le pattern Gemini de carouselai, les outils browser-use/workflow-use pour le scraping, et un fichier SQLite local comme base légère (zéro service externe).
+
+---
+
+## Phase 1 — Setup & Data Model (Semaine 1)
+
+### 1. Init projet
+
+`prospectai/` à la racine du workspace — `npx create-next-app@latest` avec App Router, TypeScript, Tailwind CSS 4, déploiement Vercel.
+
+### 2. Base de données Prisma + SQLite local
+
+Fichier `prisma/dev.db` dans le projet, Prisma ORM typesafe avec migrations auto (`npx prisma migrate dev`). Tables :
+
+- **`prospects`** : nom, prénom, entreprise, SIRET, téléphone, email, adresse, ville, code postal, source (google_maps | pappers | linkedin | pagejaunes | google_search), logo_url, site_url, google_maps_url, linkedin_url, date_création_entreprise, secteur, CA
+- **`prospect_analysis`** : FK prospect, score_global (0-100), has_website, website_score (perf/seo/design/mobile), google_rating, google_reviews_count, google_business_optimized, social_presence (json: facebook, instagram, linkedin, tiktok), services_recommandés (json array), raw_analysis (json)
+- **`generated_sites`** : FK prospect, vercel_url, template_used, html_content, status (draft | deployed | archived), deployed_at
+- **`emails`** : FK prospect, subject, body, status (draft | approved | sent | bounced | replied), sent_at, opened_at, clicked_at
+- **`scraping_jobs`** : type, params (json), status, results_count, started_at, completed_at
+- **`settings`** : user config (SMTP, API keys, templates email, zones géo)
+
+### 3. Auth simple
+
+Middleware Next.js avec mot de passe en env var (mono-user). Pas besoin d'auth complexe.
+
+### 4. Setup Nodemailer
+
+Configuration SMTP dans les settings, route API `/api/email/send` avec vérification HITL.
+
+---
+
+## Phase 2 — Scraping Multi-Sources (Semaine 1-2)
+
+### 5. Module Google Places API — `/api/scraping/google-places`
+
+- Paramètres : catégorie (restaurant, artisan, plombier, etc.), rayon km, coordonnées centre (Besançon par défaut)
+- Récupère : nom, adresse, téléphone, site web, rating, nombre d'avis, horaires, photos, place_id
+- Pagination automatique (Places API Nearby Search → Place Details pour enrichir)
+- Stockage en batch dans SQLite via Prisma avec déduplication (par téléphone + nom + code postal)
+
+### 6. Module Pappers API — `/api/scraping/pappers`
+
+- Recherche par code NAF, code postal, tranche d'effectif, date de création
+- Récupère : SIRET, raison sociale, dirigeants (nom/prénom), CA, effectif, adresse, date création
+- Enrichit les prospects existants ou en crée de nouveaux
+- API officielle avec clé (gratuit jusqu'à 100 req/mois, 19€/mois pour 1000)
+
+### 7. Module PagesJaunes — scraper via `browser-use` (Python)
+
+- Script Python utilisant `ai/browser-use/` pour naviguer PagesJaunes par catégorie + ville
+- Extrait : nom, téléphone, adresse, site web, horaires
+- Bridge Python → Next.js API via subprocess ou API Flask locale
+- Fallback : `workflow-use` pour les flux déterministes (plus rapide, moins de tokens AI)
+
+### 8. Module LinkedIn — scraper via `browser-use` (Python)
+
+- Recherche de dirigeants par mot-clé + zone géo (ex: "gérant restaurant Besançon")
+- Extraction profil public : nom, titre, entreprise, lien profil
+- **Précautions anti-ban** : rate limiting strict (10-15 profils/session), rotation de sessions, userAgent réaliste, pauses aléatoires
+- Enrichissement des prospects existants (matching par nom entreprise)
+
+### 9. Module Google Search — `/api/scraping/google-search`
+
+- Requêtes ciblées via SerpAPI ou Serper.dev : `"restaurant besançon" -site:*.com` pour trouver des commerces sans site
+- Parsing SERP pour identifier entreprises présentes uniquement via PagesJaunes, TripAdvisor, etc.
+
+### 10. Job queue & orchestrateur — `/api/scraping/run`
+
+- Interface pour lancer un scan complet (toutes sources) ou source par source
+- Cron ou manual trigger pour jobs planifiés
+- Déduplication cross-source intelligente (matching fuzzy nom+adresse+téléphone)
+- Progress tracking en temps réel via polling ou SSE
+
+---
+
+## Phase 3 — Analyse Automatique (Semaine 2-3)
+
+### 11. Analyseur de site web — `/api/analysis/website`
+
+- **Performance** : appel Google PageSpeed Insights API (gratuit) → score mobile + desktop, LCP, CLS, FID
+- **SEO** : vérification meta title/description, H1, robots.txt, sitemap.xml, HTTPS, responsive, Open Graph, structured data
+- **Design** : screenshot via Puppeteer/Playwright → analyse visuelle via Gemini (scoring modernité, UX, cohérence)
+- **Tech detection** : headers HTTP + Wappalyzer patterns (WordPress, Wix, Shopify, etc.)
+- Score composite 0-100 pondéré
+
+### 12. Analyseur fiche Google Business — `/api/analysis/google-business`
+
+- Via Place Details API : photos count, catégories remplies, horaires complets, description, attributs, Q&A
+- Analyse des avis : sentiment moyen, sujets récurrents (via Gemini), taux de réponse du propriétaire
+- Score d'optimisation 0-100
+
+### 13. Analyseur réseaux sociaux — `/api/analysis/social`
+
+- Détection de présence : Facebook, Instagram, LinkedIn, TikTok (recherche par nom entreprise)
+- Métriques basiques (followers, dernière publication) quand accessible publiquement
+- Score de présence social 0-100
+
+### 14. Scoring global & recommandation de services — `/api/analysis/score`
+
+- Algorithme de scoring composite : poids configurable (site 30%, fiche Google 25%, SEO 25%, social 20%)
+- **Moteur de recommandation** via Gemini : analyse le profil complet → recommande les services techvisor pertinents :
+  - Pas de site → "Création site web" (Launchpad Tech)
+  - Site ancien/lent → "Refonte + optimisation" (Partenaire Tech)
+  - Pas de fiche Google → "Optimisation Google Business"
+  - Pas de réseaux → "Stratégie social media"
+  - Process manuels → "Automatisation IA" (Optimiseur IA)
+- Priorité de contact basée sur le score (plus le score est bas = plus d'opportunité)
+
+---
+
+## Phase 4 — Dashboard (Semaine 3-4)
+
+### 15. Page principale `/dashboard`
+
+Liste des prospects avec :
+- Tableau sortable/filtrable : nom, entreprise, ville, score global, score site, score fiche Google, score social, services recommandés, source, statut pipeline (nouveau | analysé | site généré | email envoyé | répondu | converti)
+- Filtres rapides : par ville, par secteur, par score (< 30 = hot lead), par statut, par services recommandés
+- Recherche full-text
+- Sélection multiple pour actions en batch (analyser, générer email, etc.)
+- Vue carte (Google Maps) avec les prospects géolocalisés
+
+### 16. Page détail prospect `/dashboard/[id]`
+
+Fiche complète :
+- Infos entreprise + coordonnées + liens
+- Résultats d'analyse détaillés avec graphiques radar (site, SEO, social, Google)
+- Screenshot du site actuel vs maquette générée
+- Services recommandés avec argumentaire
+- Historique des emails envoyés + réponses
+- Actions : analyser, générer site, générer email, envoyer
+
+### 17. Page scraping `/dashboard/scraping`
+
+Lancement et suivi des jobs de scraping :
+- Formulaire : sélection sources, catégories, zone géo, rayon
+- Historique des jobs + résultats
+- Stats : nombre de prospects par source, taux d'enrichissement
+
+### 18. Page settings `/dashboard/settings`
+
+Configuration :
+- Clés API (Google Places, Pappers, SerpAPI)
+- SMTP (host, port, user, password, from email)
+- Templates email par défaut
+- Scoring weights
+- Zones géo favorites
+
+---
+
+## Phase 5 — Génération de Site (Semaine 4)
+
+### 19. Générateur de site vitrine — `/api/generate/website`
+
+- Input : données prospect (nom, secteur, adresse, téléphone, avis Google, photos Google)
+- Prompt Gemini (ou Claude via API) : génère un site one-page complet (HTML + Tailwind CSS inline) avec :
+  - Hero section avec nom + secteur + photo
+  - À propos
+  - Services / Menu (adapté au secteur)
+  - Avis Google intégrés
+  - Carte Google Maps embed
+  - Contact (téléphone, adresse, horaires)
+  - Footer
+- 3-4 templates/thèmes par secteur (restaurant, artisan, commerce, pro libéral)
+- Preview dans le dashboard avant deploy
+
+### 20. Déploiement Vercel HITL — `/api/generate/deploy`
+
+- Utilisation Vercel API pour créer un projet + déployer le HTML statique
+- Sous-domaine automatique : `{nom-entreprise}.vercel.app`
+- **Human-in-the-loop** : preview dans le dashboard → bouton "Approuver & Déployer"
+- Possibilité d'éditer le HTML avant déploiement
+- Tracking du site déployé dans `generated_sites`
+
+---
+
+## Phase 6 — Emails Personnalisés (Semaine 4-5)
+
+### 21. Générateur d'email — `/api/generate/email`
+
+- Prompt Gemini avec contexte complet du prospect : nom dirigeant, entreprise, secteur, analyse site, score, services recommandés, site généré (si applicable)
+- Ton professionnel mais chaleureux, en français
+- Templates par scénario :
+  - "Pas de site" → mention du site généré avec lien preview
+  - "Site vieillissant" → benchmark avec concurrents locaux
+  - "Fiche Google non optimisée" → quick wins mentionnés
+  - "Startup sans CTO" → proposition Partenaire Tech
+- Personnalisation fine : références locales, mention d'un avis spécifique, saisonnalité
+- Subject line A/B testing (2 propositions)
+
+### 22. Workflow d'envoi HITL
+
+Dans le dashboard :
+- Liste des emails "prêts à envoyer" avec preview
+- Édition possible du contenu avant envoi
+- Bouton "Approuver & Envoyer" (unitaire ou batch)
+- Envoi via Nodemailer SMTP
+- Tracking : email-sent timestamp, possibilité tracking pixel (optionnel)
+
+### 23. Suivi des réponses — `/api/email/webhook`
+
+- Détection des réponses (IMAP polling ou webhook si SMTP le supporte)
+- Mise à jour du statut prospect automatiquement
+- Notification (email ou webhook vers n8n/WhatsApp)
+
+---
+
+## Phase 7 — Polish & Optimisation (Semaine 5-6)
+
+### 24. Stats & KPI dashboard — `/dashboard/stats`
+
+- Prospects scrapés / analysés / contactés / répondus / convertis (funnel)
+- Taux d'ouverture, taux de réponse, taux de conversion
+- Meilleurs secteurs, meilleures zones géo
+- ROI estimé
+
+### 25. Intégration n8n (optionnel V1.1)
+
+Connecter au pipeline n8n existant :
+- Webhook n8n déclenché à chaque nouveau lead qualifié
+- Notification WhatsApp via le bot déjà spec'd dans techvisor-n8n
+- Sync bidirectionnelle avec Notion CRM si activé
+
+### 26. Compliance RGPD
+
+- Lien de désinscription dans chaque email
+- Registre de traitement dans la base
+- Respect de l'opt-out immédiat
+- Base légale : intérêt légitime (B2B) — vérifier conformité avec CNIL pour cold email B2B
+
+---
+
+## Vérification
+
+- **Scraping** : lancer un scan "restaurants Besançon 10km" → vérifier que 50+ prospects sont créés avec données complètes
+- **Analyse** : prendre 10 prospects avec site → vérifier que les scores PageSpeed/SEO/design sont cohérents manuellement
+- **Génération site** : prendre un restaurant sans site → vérifier que le site généré est beau, responsive, et contient les bonnes infos
+- **Email** : générer 5 emails pour des profils différents → vérifier que chaque email est pertinent et personnalisé
+- **Pipeline complet** : scrape → analyse → score → génération → email → envoi, sur 3 prospects réels
+- **Tests unitaires** : scoring algorithm, déduplication, matching fuzzy
+- **E2E** : Playwright tests sur les flows critiques du dashboard
+
+---
+
+## Décisions techniques
+
+| Choix | Raison |
+|---|---|
+| **Next.js + Prisma + SQLite local** | Léger, typesafe, fichier `.db` dans le repo, zéro service externe, migrations auto |
+| **Nodemailer SMTP** | Zéro coût, contrôle total, suffisant pour < 100 emails/jour |
+| **Gemini** (LLM principal) | Déjà intégré dans carouselai, bon pour génération contenu + analyse visuelle |
+| **browser-use + Python** | Robuste pour scraping LinkedIn/PagesJaunes, auto-adaptation DOM |
+| **Human-in-the-loop** | Emails ET déploiement sites : contrôle qualité 100% en V1 |
+| **Pappers API** | API légale vs scraping Societe.com, données fiables, 19€/mois |
+| **Auth simple (env var)** | Mono-user, pas besoin d'un service auth complet |
+| **SSE / polling** | Léger pour le suivi des jobs, pas besoin de realtime complexe |

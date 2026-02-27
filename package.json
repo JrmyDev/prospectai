@@ -9,18 +9,41 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "next": "16.1.6",
-    "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "@google/genai": "^1.40.0",
+      "@prisma/adapter-better-sqlite3": "^7.3.0",
+      "@prisma/client": "7.4.1",
+      "better-sqlite3": "^12.6.2",
+      "date-fns": "^4.1.0",
+      "dotenv": "^17.2.4",
+      "html-to-image": "^1.11.13",
+      "jspdf": "^4.1.0",
+      "lucide-react": "^0.563.0",
+      "next": "16.1.6",
+      "nodemailer": "^8.0.1",
+      "openai": "^6.6.0",
+      "playwright": "^1.58.2",
+      "react": "19.2.3",
+      "react-dom": "19.2.3",
+      "recharts": "^3.7.0",
+      "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
+    "@types/nodemailer": "^7.0.9",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5",
+    "prisma": "7.4.1"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3"
+    ]
   }
 }
