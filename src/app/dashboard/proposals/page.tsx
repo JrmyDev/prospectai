@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FileText, Plus, Sparkles } from "lucide-react";
@@ -31,6 +31,14 @@ type SlideFormat = "16:9" | "A4";
 type ThemePreset = "modern" | "corporate" | "creative" | "minimal";
 
 export default function ProposalsPage() {
+  return (
+    <Suspense fallback={<div className="text-gray-400">Chargement...</div>}>
+      <ProposalsPageContent />
+    </Suspense>
+  );
+}
+
+function ProposalsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const presetProspectId = searchParams.get("prospectId") || "";

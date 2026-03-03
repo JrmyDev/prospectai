@@ -3,14 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "pnpm db:generate && next dev",
+    "build": "pnpm db:generate && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:generate": "node scripts/prisma-generate.mjs",
+    "db:generate:sqlite": "prisma generate --schema prisma/schema.prisma",
+    "db:generate:postgres": "prisma generate --schema prisma/schema.postgres.prisma",
+    "db:push:sqlite": "prisma db push --schema prisma/schema.prisma",
+    "db:push:postgres": "prisma db push --schema prisma/schema.postgres.prisma"
   },
   "dependencies": {
     "@google/genai": "^1.40.0",
       "@prisma/adapter-better-sqlite3": "^7.3.0",
+      "@prisma/adapter-pg": "^7.4.1",
       "@prisma/client": "7.4.1",
       "better-sqlite3": "^12.6.2",
       "date-fns": "^4.1.0",
@@ -22,6 +28,7 @@
       "nodemailer": "^8.0.1",
       "openai": "^6.6.0",
       "playwright": "^1.58.2",
+      "pg": "^8.16.3",
       "react": "19.2.3",
       "react-dom": "19.2.3",
       "recharts": "^3.7.0",

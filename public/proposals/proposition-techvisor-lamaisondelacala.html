@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposition Techvisor — La Maison de la Cala</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" rel="stylesheet">
+<style>
+  @page {
+    size: 1134px 638px;
+    margin: 0;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: #1a1a1a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 24px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .slide {
+    width: 1134px;
+    height: 638px;
+    background: #ffffff;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+    page-break-after: always;
+  }
+
+  /* ============================================================
+     SLIDE 1 — COVER
+     ============================================================ */
+  .slide-1 {
+    background: #040404;
+    color: #f3f3f3;
+  }
+  .slide-1 .bg-image {
+    position: absolute;
+    top: -280px;
+    left: 0;
+    width: 1134px;
+    height: auto;
+    opacity: 0.55;
+    object-fit: cover;
+  }
+  .slide-1 .content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    padding: 42px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .slide-1 .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .slide-1 .brand {
+    font-size: 12px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+  }
+  .slide-1 .date {
+    font-size: 12px;
+    font-weight: 300;
+  }
+  .slide-1 .bottom-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .slide-1 .title-block h1 {
+    font-size: 60px;
+    font-weight: 300;
+    line-height: 1.05;
+  }
+  .slide-1 .subtitle-block {
+    text-align: right;
+    max-width: 300px;
+    padding-bottom: 8px;
+  }
+  .slide-1 .subtitle-block p {
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 1.25;
+  }
+
+  /* ============================================================
+     SLIDE 2 — VISION DU PROJET
+     ============================================================ */
+  .slide-2 .circle-image {
+    position: absolute;
+    left: 348px;
+    top: 42px;
+    width: 438px;
+    height: 438px;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+  .slide-2 .circle-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .slide-2 h2 {
+    position: absolute;
+    left: 192px;
+    bottom: 70px;
+    font-size: 36px;
+    font-weight: 300;
+    color: #0b0b0b;
+  }
+  .slide-2 .description {
+    position: absolute;
+    left: 654px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 15px;
+    font-weight: 300;
+    color: #0b0b0b;
+    line-height: 1.3;
+  }
+
+  /* ============================================================
+     SLIDE 3 — NOTRE APPROCHE
+     ============================================================ */
+  .slide-3 .heading {
+    position: absolute;
+    left: 57px;
+    top: 62px;
+  }
+  .slide-3 .heading h2 {
+    font-size: 48px;
+    font-weight: 300;
+    color: #0b0b0b;
+    line-height: 1.0;
+  }
+  .slide-3 .heading .sub {
+    font-size: 18px;
+    font-weight: 300;
+    color: #0b0b0b;
+    line-height: 1.25;
+    margin-top: 16px;
+    max-width: 420px;
+  }
+  .slide-3 .card {
+    position: absolute;
+    right: 42px;
+    width: 326px;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 22px 24px;
+  }
+  .slide-3 .card-1 { top: 61px; height: 164px; }
+  .slide-3 .card-2 { top: 237px; height: 164px; }
+  .slide-3 .card-3 { top: 412px; height: 164px; }
+  .slide-3 .card .number {
+    font-size: 9px;
+    color: #050505;
+    font-weight: 400;
+    margin-bottom: 14px;
+  }
+  .slide-3 .card h3 {
+    font-size: 15px;
+    font-weight: 400;
+    color: #0b0b0b;
+    margin-bottom: 6px;
+  }
+  .slide-3 .card p {
+    font-size: 12px;
+    font-weight: 300;
+    color: #0b0b0b;
+    line-height: 1.2;
+  }
+
+  /* ============================================================
+     SLIDE 4 — LE PROBLÈME
+     ============================================================ */
+  .slide-4 .hero-image {
+    position: absolute;
+    left: 42px;
+    top: 42px;
+    width: 344px;
+    height: 554px;
+    border-radius: 24px;
+    overflow: hidden;
+  }
+  .slide-4 .hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .slide-4 .text-block {
+    position: absolute;
+    left: 420px;
+    top: 42px;
+    right: 42px;
+  }
+  .slide-4 .pill {
+    font-size: 9px;
+    color: #000;
+    font-weight: 400;
+    background: #cccdff;
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+  }
+  .slide-4 .text-block h2 {
+    font-size: 40.5px;
+    font-weight: 300;
+    color: #0b0b0b;
+    line-height: 1.05;
+    margin-bottom: 36px;
+  }
+  .slide-4 .cols {
+    display: flex;
+    gap: 32px;
+  }
+  .slide-4 .col { flex: 1; max-width: 310px; }
+  .slide-4 .col h3 {
+    font-size: 18px;
+    font-weight: 300;
+    color: #0b0b0b;
+    line-height: 1.25;
+    margin-bottom: 14px;
+  }
+  .slide-4 .col p {
+    font-size: 15px;
+    font-weight: 300;
+    color: #0b0b0b;
+    line-height: 1.22;
+  }
+
+  /* ============================================================
+     SLIDE 5 — LA SOLUTION
+     ============================================================ */
+  /* Slide 5 full-height background screen */
+  .slide-5 .bg-screen {
+    position: absolute;
+    left: 405px;
+    top: 0;
+    width: 729px;
+    height: 100%;
+    overflow: hidden;
+  }
+  .slide-5 .bg-screen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
+  }
+  .slide-5 .text-block {
+    position: absolute;
+    left: 32px;
+    top: 60px;
+    z-index: 2;
+    max-width: 500px;
+  }
+  .slide-5 .text-block h2 {
+    font-size: 36px;
+    font-weight: 600;
+    color: #050505;
+    line-height: 1.05;
+    margin-bottom: 32px;
+  }
+  .slide-5 .text-block .desc {
+    font-size: 18px;
+    font-weight: 300;
+    color: #050505;
+    line-height: 1.25;
+    margin-bottom: 26px;
+    max-width: 440px;
+  }
+  .slide-5 .benefits h4 {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #050505;
+    margin-bottom: 8px;
+  }
+  .slide-5 .benefits ol {
+    list-style: none;
+    padding: 0;
+    counter-reset: benefit;
+  }
+  .slide-5 .benefits ol li {
+    font-size: 13.5px;
+    font-weight: 300;
+    color: #050505;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    padding-left: 22px;
+    position: relative;
+    counter-increment: benefit;
+  }
+  .slide-5 .benefits ol li::before {
+    content: counter(benefit) ".";
+    position: absolute;
+    left: 0;
+  }
+  .slide-5 .screen-large {
+    position: absolute;
+    left: 432px;
+    top: 115px;
+    width: 646px;
+    height: 413px;
+    border-radius: 10px;
+    overflow: hidden;
+    z-index: 1;
+  }
+  .slide-5 .screen-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .slide-5 .caption {
+    position: absolute;
+    bottom: 44px;
+    right: 80px;
+    font-size: 15px;
+    font-weight: 300;
+    color: #a19e97;
+    z-index: 3;
+  }
+
+  /* ============================================================
+     SLIDE 6 — PACKS / SOLUTIONS
+     ============================================================ */
+  .slide-6 .heading {
+    position: absolute;
+    left: 44px;
+    top: 42px;
+  }
+  .slide-6 .heading h2 {
+    font-size: 48px;
+    font-weight: 300;
+    color: #0b0b0b;
+    line-height: 1.0;
+  }
+  .slide-6 .heading h2 .muted {
+    color: #a19e97;
+  }
+  .slide-6 .pack-card {
+    position: absolute;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .slide-6 .pack-1 {
+    left: 477px;
+    top: 185px;
+    width: 300px;
+    height: 412px;
+  }
+  .slide-6 .pack-2 {
+    left: 792px;
+    top: 234px;
+    width: 300px;
+    height: 363px;
+  }
+  .slide-6 .pack-card h3 {
+    font-size: 24px;
+    font-weight: 400;
+    color: #0b0b0b;
+    margin-bottom: 4px;
+  }
+  .slide-6 .pack-card .price-line {
+    font-size: 15.6px;
+    font-weight: 300;
+    color: #a19e97;
+    margin-bottom: 22px;
+    line-height: 1.3;
+  }
+  .slide-6 .pack-card .price-line .price {
+    color: #4d79f5;
+    font-weight: 600;
+  }
+  .slide-6 .pack-card .features {
+    list-style: none;
+    padding: 0;
+  }
+  .slide-6 .pack-card .features li {
+    font-size: 15.6px;
+    font-weight: 300;
+    color: #0b0b0b;
+    padding: 5px 0;
+    padding-left: 24px;
+    position: relative;
+    line-height: 1.25;
+  }
+  .slide-6 .pack-card .features li::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 12px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #0a0a0a;
+  }
+
+  /* ============================================================
+     SLIDE 7 — ROI
+     ============================================================ */
+  .slide-7 .heading {
+    position: absolute;
+    left: 98px;
+    top: 42px;
+  }
+  .slide-7 .pill {
+    font-size: 9px;
+    color: #000;
+    font-weight: 400;
+    background: #cccdff;
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+  }
+  .slide-7 .heading h2 {
+    font-size: 48px;
+    font-weight: 300;
+    color: #0b0b0b;
+    line-height: 1.0;
+    margin-bottom: 14px;
+  }
+  .slide-7 .heading .sub {
+    font-size: 18px;
+    font-weight: 300;
+    color: #0b0b0b;
+    line-height: 1.25;
+    max-width: 360px;
+  }
+  .slide-7 .heading .sub + .sub {
+    margin-top: 18px;
+  }
+  .slide-7 .roi-card {
+    position: absolute;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 18px 20px;
+  }
+  .slide-7 .roi-tl { left: 476px; top: 50px; width: 218px; height: 198px; }
+  .slide-7 .roi-tr { left: 705px; top: 51px; width: 237px; height: 303px; }
+  .slide-7 .roi-bl { left: 476px; top: 259px; width: 218px; height: 279px; }
+  .slide-7 .roi-br { left: 705px; top: 369px; width: 237px; height: 169px; }
+  .slide-7 .roi-card .icon {
+    font-size: 18px;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .slide-7 .roi-card h3 {
+    font-size: 15px;
+    font-weight: 400;
+    color: #0b0b0b;
+    margin-bottom: 4px;
+    line-height: 1.25;
+  }
+  .slide-7 .roi-card p {
+    font-size: 12px;
+    font-weight: 300;
+    color: #0b0b0b;
+    line-height: 1.2;
+  }
+  .slide-7 .disclaimer {
+    position: absolute;
+    bottom: 30px;
+    left: 476px;
+    right: 42px;
+    font-size: 12px;
+    font-weight: 300;
+    color: #0b0b0b;
+    line-height: 1.2;
+  }
+
+  /* ============================================================
+     SLIDE 8 — FORFAITS & OPTIONS
+     ============================================================ */
+  .slide-8 .heading {
+    position: absolute;
+    left: 98px;
+    top: 42px;
+  }
+  .slide-8 .pill {
+    font-size: 9px;
+    color: #000;
+    font-weight: 400;
+    background: #cccdff;
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+  }
+  .slide-8 .heading h2 {
+    font-size: 48px;
+    font-weight: 300;
+    color: #0b0b0b;
+    line-height: 1.0;
+    margin-bottom: 10px;
+  }
+  .slide-8 .heading .sub {
+    font-size: 18px;
+    font-weight: 300;
+    color: #0b0b0b;
+    line-height: 1.25;
+    max-width: 340px;
+  }
+
+  .slide-8 .p-card {
+    position: absolute;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 18px 20px;
+  }
+  .slide-8 .p-essentiel { left: 465px; top: 77px; width: 261px; height: 147px; }
+  .slide-8 .p-essentiel.has-bg { background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('proposition-cala/page8_img1.jpeg') center/cover; color: #fff; }
+  .slide-8 .p-essentiel.has-bg h3, .slide-8 .p-essentiel.has-bg p, .slide-8 .p-essentiel.has-bg .icon { color: #fff; }
+  .slide-8 .p-confort { left: 477px; top: 241px; width: 237px; height: 149px; }
+  .slide-8 .p-premium { left: 477px; top: 405px; width: 237px; height: 159px; }
+  .slide-8 .p-autonome { left: 729px; top: 78px; width: 237px; height: 198px; }
+  .slide-8 .p-domaine { left: 729px; top: 291px; width: 237px; height: 218px; }
+  .slide-8 .p-card .icon {
+    font-size: 18px;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .slide-8 .p-card h3 {
+    font-size: 15px;
+    font-weight: 400;
+    color: #0b0b0b;
+    margin-bottom: 4px;
+  }
+  .slide-8 .p-card p {
+    font-size: 12px;
+    font-weight: 300;
+    color: #0b0b0b;
+    line-height: 1.2;
+  }
+
+  /* ============================================================
+     SLIDE 9 — SERVICES COMPLÉMENTAIRES
+     ============================================================ */
+  .slide-9 .heading {
+    position: absolute;
+    left: 242px;
+    top: 58px;
+  }
+  .slide-9 .pill {
+    font-size: 9px;
+    color: #000;
+    font-weight: 400;
+    background: #cccdff;
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+  }
+  .slide-9 .heading h2 {
+    font-size: 48px;
+    font-weight: 300;
+    color: #0b0b0b;
+    line-height: 1.0;
+  }
+  .slide-9 .svc-card {
+    position: absolute;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px 24px;
+  }
+  .slide-9 .svc-tl { left: 243px; top: 255px; width: 327px; height: 141px; }
+  .slide-9 .svc-tr { left: 591px; top: 255px; width: 326px; height: 141px; }
+  .slide-9 .svc-bl { left: 243px; top: 408px; width: 214px; height: 141px; }
+  .slide-9 .svc-br { left: 468px; top: 408px; width: 231px; height: 141px; }
+  .slide-9 .svc-card .icon {
+    font-size: 18px;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .slide-9 .svc-card h3 {
+    font-size: 15px;
+    font-weight: 400;
+    color: #0b0b0b;
+    margin-bottom: 6px;
+  }
+  .slide-9 .svc-card p {
+    font-size: 12px;
+    font-weight: 300;
+    color: #0b0b0b;
+    line-height: 1.2;
+  }
+
+  /* ============================================================
+     SLIDE 10 — ÉTAPES SUIVANTES
+     ============================================================ */
+  .slide-10 .heading {
+    position: absolute;
+    top: 42px;
+    left: 0;
+    right: 0;
+    text-align: center;
+  }
+  .slide-10 .heading h2 {
+    font-size: 36px;
+    font-weight: 300;
+    color: #0b0b0b;
+    margin-bottom: 10px;
+  }
+  .slide-10 .heading p {
+    font-size: 15px;
+    font-weight: 300;
+    color: #0b0b0b;
+    line-height: 1.3;
+  }
+  .slide-10 .step-card {
+    position: absolute;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px 24px;
+    top: 251px;
+    height: 166px;
+  }
+  .slide-10 .step-1 { left: 192px; width: 228px; }
+  .slide-10 .step-2 { left: 437px; width: 244px; }
+  .slide-10 .step-3 { left: 698px; width: 241px; }
+  .slide-10 .step-card .icon {
+    font-size: 18px;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .slide-10 .step-card h3 {
+    font-size: 15px;
+    font-weight: 400;
+    color: #0b0b0b;
+    margin-bottom: 18px;
+  }
+  .slide-10 .step-card p {
+    font-size: 12px;
+    font-weight: 300;
+    color: #0b0b0b;
+    line-height: 1.2;
+  }
+
+  /* ============================================================
+     SLIDE 11 — CONTACT
+     ============================================================ */
+  .slide-11 .logo {
+    position: absolute;
+    top: 23px;
+    left: 42px;
+    height: 32px;
+  }
+  .slide-11 .text-block {
+    position: absolute;
+    left: 42px;
+    top: 100px;
+    max-width: 600px;
+  }
+  .slide-11 .text-block h2 {
+    font-size: 42px;
+    font-weight: 600;
+    color: #050505;
+    line-height: 1.15;
+  }
+  .slide-11 .text-block h2 .spacer {
+    display: block;
+    height: 40px;
+  }
+  .slide-11 .contact {
+    position: absolute;
+    left: 42px;
+    bottom: 36px;
+  }
+  .slide-11 .contact p {
+    font-size: 18px;
+    font-weight: 300;
+    color: #050505;
+    line-height: 1.3;
+  }
+  .slide-11 .portrait {
+    position: absolute;
+    right: 81px;
+    bottom: -32px;
+    width: 400px;
+    height: 400px;
+    border-radius: 24px;
+    overflow: hidden;
+  }
+  .slide-11 .portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media print {
+    body { background: white; padding: 0; gap: 0; }
+    .slide { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== SLIDE 1 — COVER ==================== -->
+<div class="slide slide-1">
+  <img src="proposition-cala/page1_img1.png" alt="" class="bg-image">
+  <div class="content">
+    <div class="top-bar">
+      <span class="brand">Techvisor</span>
+      <span class="date">Février 2026</span>
+    </div>
+    <div class="bottom-content">
+      <div class="title-block">
+        <h1>La maison de la Cala</h1>
+        <h1>Proposition stratégique</h1>
+      </div>
+      <div class="subtitle-block">
+        <p>Créez votre présence digitale<br>indépendante et performante.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 2 — VISION DU PROJET ==================== -->
+<div class="slide slide-2">
+  <div class="circle-image">
+    <img src="proposition-cala/page2_img1.png" alt="">
+  </div>
+  <h2>Vision du projet</h2>
+  <div class="description">
+    Notre solution personnalisée vise à<br>
+    capturer l'essence de votre chambre<br>
+    d'hôte tout en augmentant vos<br>
+    réservations directes.
+  </div>
+</div>
+
+<!-- ==================== SLIDE 3 — NOTRE APPROCHE ==================== -->
+<div class="slide slide-3">
+  <div class="heading">
+    <h2>Notre approche<br>personnalisée et<br>indépendante</h2>
+    <p class="sub">Notre solution se distingue par son caractère<br>entièrement personnalisé et sa philosophie<br>d'indépendance numérique</p>
+  </div>
+  <div class="card card-1">
+    <div class="number">01</div>
+    <h3>Pleine propriété</h3>
+    <p>Vous conservez tous les droits sur le code source,<br>le nom de domaine et vos données.</p>
+  </div>
+  <div class="card card-2">
+    <div class="number">02</div>
+    <h3>Méthode progressive</h3>
+    <p>Nous limitons les risques avec une approche par<br>étapes mesurables qui a augmenté les<br>réservations de 25%.</p>
+  </div>
+  <div class="card card-3">
+    <div class="number">03</div>
+    <h3>Site sur mesure</h3>
+    <p>Développement personnalisé sans dépendance à<br>une plateforme fermée comme Wix ou Webflow.</p>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 4 — LE PROBLÈME ==================== -->
+<div class="slide slide-4">
+  <div class="hero-image">
+    <img src="proposition-cala/page4_img1.png" alt="">
+  </div>
+  <div class="text-block">
+    <div class="pill">Le problème</div>
+    <h2>Gérer sa chambre d'hôte via<br>des plateformes tierces, c'est<br>être dépendant pour son<br>activité</h2>
+    <div class="cols">
+      <div class="col">
+        <h3>Des commissions qui pèsent<br>lourd</h3>
+        <p>Les plateformes prélèvent 15 à 25% de<br>commissions sur chaque réservation.<br>Sur une saison complète, cela<br>représente des milliers d'euros qui ne<br>reviennent jamais à l'hôte.</p>
+      </div>
+      <div class="col">
+        <h3>Une fidélisation limitée</h3>
+        <p>Les coordonnées des voyageurs<br>restent chez la plateforme. Impossible<br>de fidéliser, de proposer un retour ou<br>de construire sa propre marque.<br>L'hôte devient un simple prestataire<br>anonyme.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 5 — LA SOLUTION ==================== -->
+<div class="slide slide-5">
+  <div class="bg-screen"><img src="proposition-cala/page5_img1.jpeg" alt=""></div>
+  <div class="text-block">
+    <h2>La solution.<br>Votre propre site.<br>Vos règles.</h2>
+    <p class="desc">Un site sur mesure qui vous appartient à 100<br>% – zéro commission, clients fidélisés,<br>marque forte &amp; présence en ligne.</p>
+    <div class="benefits">
+      <h4>Bénéfices</h4>
+      <ol>
+        <li>Zéro commission : gardez 100% des revenus</li>
+        <li>Fidélisation directe : constituez une base de<br>données clients pour les fidéliser</li>
+        <li>Votre marque, votre identité : une site beau et<br>unique qui racontre votre histoire.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="screen-large">
+    <img src="proposition-cala/page5_img3.png" alt="">
+  </div>
+  <span class="caption">Exemple indicatif d'un site sur mesure</span>
+</div>
+
+<!-- ==================== SLIDE 6 — SOLUTIONS / PACKS ==================== -->
+<div class="slide slide-6">
+  <div class="heading">
+    <h2>Solutions<br><span class="muted">Deux options<br>adaptées à vos<br>besoins</span></h2>
+  </div>
+  <div class="pack-card pack-1">
+    <h3>Pack 1</h3>
+    <div class="price-line">Site Simple - <span class="price">890 € HT</span></div>
+    <ul class="features">
+      <li>1 à 2 pages</li>
+      <li>Formulaire manuel par email</li>
+      <li>Galerie photos et tarifs</li>
+      <li>Détails du logement</li>
+      <li>Affichage tarif préférentiel</li>
+      <li>Boutons redirection vers<br>plateforme</li>
+      <li>SEO technique basique</li>
+      <li>2 allers retours de<br>modifications inclus</li>
+    </ul>
+  </div>
+  <div class="pack-card pack-2">
+    <h3>Pack 2</h3>
+    <div class="price-line">Site Complet - <span class="price">à partir de 1990€<br>(sur devis)</span></div>
+    <ul class="features">
+      <li>Toutes fonctionnalités Pack 1</li>
+      <li>Réservation en ligne sur le<br>site</li>
+      <li>Gestion calendrier</li>
+      <li>Gestion des reservations</li>
+      <li>Facturation</li>
+      <li>4 allers retours de<br>modifications inclus</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 7 — ROI ==================== -->
+<div class="slide slide-7">
+  <div class="heading">
+    <div class="pill">ROI</div>
+    <h2>Un retour sur<br>investissement<br>progressif et<br>mesurable</h2>
+    <p class="sub">Notre approche vise un retour sur<br>investissement progressif, avec des<br>économies mesurables sur les<br>commissions évitées.</p>
+    <p class="sub">Avoir une image de marque en ligne et<br>construire une base de données clients<br>est un atout.</p>
+  </div>
+
+  <div class="roi-card roi-tl">
+    <span class="icon"><i class="ph ph-chart-bar"></i></span>
+    <h3>Analyse ROI transparente</h3>
+    <p>Calculs basés sur un prix moyen<br>de 106€ par nuit avec 18% de<br>commission évitée.</p>
+  </div>
+  <div class="roi-card roi-tr">
+    <span class="icon"><i class="ph ph-magnifying-glass"></i></span>
+    <h3>Visibilité optimisée</h3>
+    <p>Le référencement naturel (SEO) de<br>votre site contribue<br>progressivement à votre visibilité<br>en ligne.<br><br>Les résultats dépendent<br>néanmoins de plusieurs facteurs :<br>saisonalité, concurrence, avis<br>clients, qualité des photos,<br>attractivité de l'offre, présence en<br>ligne (blog, réseaux socieux…)</p>
+  </div>
+  <div class="roi-card roi-bl">
+    <span class="icon"><i class="ph ph-coin"></i></span>
+    <h3>Économies substantielles<br>par réservation</h3>
+    <p>Chaque réservation directe vous<br>fait économiser environ 19€ sur<br>les commissions de<br>plateformes.</p>
+  </div>
+  <div class="roi-card roi-br">
+    <span class="icon"><i class="ph ph-trend-up"></i></span>
+    <h3>Gains progressifs</h3>
+    <p>10 réservations directes = 190€<br>économisés, 20 = 380€, 30 = 570€<br>d'économies annuelles.</p>
+  </div>
+
+  <div class="disclaimer">Exemple indicatif – dépend de votre prix/nuit réel, du taux d'occupation direct et d'autres facteurs (saison, concurrence, qualité photos, etc.). Pas de garantie de volume.</div>
+</div>
+
+<!-- ==================== SLIDE 8 — FORFAITS & OPTIONS ==================== -->
+<div class="slide slide-8">
+  <div class="heading">
+    <div class="pill">Prix</div>
+    <h2>Forfaits et<br>options</h2>
+    <p class="sub">Pour maintenir votre site performant,<br>nous proposons plusieurs formules<br>d'hébergement et maintenance.</p>
+  </div>
+
+  <div class="p-card p-essentiel has-bg">
+    <span class="icon"><i class="ph ph-house"></i></span>
+    <h3>Forfait Essentiel</h3>
+    <p>29 € HT/mois pour un hébergement<br>sécurisé avec SSL, sauvegardes et<br>domaine sans engagement.</p>
+  </div>
+  <div class="p-card p-confort">
+    <span class="icon"><i class="ph ph-star"></i></span>
+    <h3>Forfait Confort</h3>
+    <p>69 € HT/mois incluant l'Essentiel<br>plus une modification mensuelle<br>(30min) et support email standard<br>avec engagement 12 mois.</p>
+  </div>
+  <div class="p-card p-premium">
+    <span class="icon"><i class="ph ph-diamond"></i></span>
+    <h3>Forfait Premium</h3>
+    <p>149 € HT/mois avec tout le Confort,<br>support prioritaire et 1h<br>d'intervention mensuelle avec<br>engagement 12 mois.</p>
+  </div>
+  <div class="p-card p-autonome">
+    <span class="icon"><i class="ph ph-desktop"></i></span>
+    <h3>Option Autonome</h3>
+    <p>800 € au setup pour une livraison<br>complète du code, vous<br>permettant de gérer votre propre<br>hébergement.</p>
+  </div>
+  <div class="p-card p-domaine">
+    <span class="icon"><i class="ph ph-globe"></i></span>
+    <h3>Nom de domaine</h3>
+    <p>Un nom de domaine est obligatoire<br>pour héberger votre site internet.<br>Selon les noms les prix varient.<br>Il faut compter environ 10€/an pour<br>un nom de domaine basique.<br>Inclus dans les forfaits pour les<br>domaines &lt; 20€/an.</p>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 9 — SERVICES COMPLÉMENTAIRES ==================== -->
+<div class="slide slide-9">
+  <div class="heading">
+    <div class="pill">Services complémentaires</div>
+    <h2>Maximiser l'impact de votre<br>présence en ligne</h2>
+  </div>
+
+  <div class="svc-card svc-tl">
+    <span class="icon"><i class="ph ph-map-pin"></i></span>
+    <h3>Présence locale</h3>
+    <p>Optimisation Google My Business - 500 €</p>
+  </div>
+  <div class="svc-card svc-tr">
+    <span class="icon"><i class="ph ph-palette"></i></span>
+    <h3>Identité visuelle</h3>
+    <p>Refonte charte graphique - 1200 €</p>
+  </div>
+  <div class="svc-card svc-bl">
+    <span class="icon"><i class="ph ph-article"></i></span>
+    <h3>Contenu engageant</h3>
+    <p>Mise en place blog avec article<br>initial - à partir de 600€</p>
+  </div>
+  <div class="svc-card svc-br">
+    <span class="icon"><i class="ph ph-magnifying-glass"></i></span>
+    <h3>Visibilité web</h3>
+    <p>Audit + optimisation SEO - 1500 €</p>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 10 — ÉTAPES SUIVANTES ==================== -->
+<div class="slide slide-10">
+  <div class="heading">
+    <h2>Étapes suivantes</h2>
+    <p>Pour concrétiser ce projet et commencer à générer<br>des réservations directes.</p>
+  </div>
+
+  <div class="step-card step-1">
+    <span class="icon"><i class="ph ph-phone"></i></span>
+    <h3>Consultation initiale</h3>
+    <p>Appel découverte gratuit (15<br>minutes) pour affiner vos<br>besoins</p>
+  </div>
+  <div class="step-card step-2">
+    <span class="icon"><i class="ph ph-file-text"></i></span>
+    <h3>Proposition détaillée</h3>
+    <p>Réception d'un devis<br>personnalisé et définitif</p>
+  </div>
+  <div class="step-card step-3">
+    <span class="icon"><i class="ph ph-rocket-launch"></i></span>
+    <h3>Lancement</h3>
+    <p>Signature et versement initial<br>pour démarrer la création avec<br>suivi régulier</p>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 11 — CONTACT ==================== -->
+<div class="slide slide-11">
+  <img src="proposition-cala/page11_img2.png" alt="Techvisor" class="logo">
+  <div class="text-block">
+    <h2>Un interlocuteur unique.<span class="spacer"></span>10 ans d'expérience tech à votre service.</h2>
+  </div>
+  <div class="contact">
+    <p>Jérémy Marquer</p>
+    <p>contact@jeremymarquer.fr</p>
+    <p>06.84.26.43.49</p>
+  </div>
+  <div class="portrait">
+    <img src="proposition-cala/page11_img1.jpeg" alt="">
+  </div>
+</div>
+
+</body>
+</html>

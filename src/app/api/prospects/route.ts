@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
   const sortBy = url.searchParams.get("sortBy") || "createdAt";
   const sortOrder = url.searchParams.get("sortOrder") || "desc";
   const hasWebsite = url.searchParams.get("hasWebsite");
+  const hasPhone = url.searchParams.get("hasPhone") ?? "true";
   const maxScore = url.searchParams.get("maxScore");
   const excludeStatus = url.searchParams.get("excludeStatus");
   const callStatus = url.searchParams.get("callStatus");
@@ -33,6 +34,13 @@ export async function GET(request: NextRequest) {
       { email: { contains: search } },
       { phone: { contains: search } },
     ];
+  }
+  const andFilters: Record<string, unknown>[] = [];
+  if (hasPhone === "true") {
+    andFilters.push({ phone: { not: null } }, { phone: { not: "" } });
+  }
+  if (hasPhone === "false") {
+    andFilters.push({ OR: [{ phone: null }, { phone: "" }] });
   }
   if (hasWebsite === "true") where.siteUrl = { not: null };
   if (hasWebsite === "false") where.siteUrl = null;
@@ -71,6 +79,9 @@ export async function GET(request: NextRequest) {
       where.nextCallAt = { lt: end };
       where.callStatus = "callback";
     }
+  }
+  if (andFilters.length > 0) {
+    where.AND = andFilters;
   }
 
   const [prospects, total] = await Promise.all([

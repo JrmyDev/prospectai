@@ -1,0 +1,181 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Prospect {
+  id                    String   @id @default(cuid())
+  firstName             String?
+  lastName              String?
+  company               String
+  siret                 String?
+  phone                 String?
+  email                 String?
+  address               String?
+  city                  String?
+  postalCode            String?
+  source                String   // google_maps | pappers | linkedin | pagejaunes | google_search
+  logoUrl               String?
+  siteUrl               String?
+  googleMapsUrl         String?
+  linkedinUrl           String?
+  companyCreatedAt      String?
+  sector                String?
+  revenue               String?
+  placeId               String?  @unique
+  status                String   @default("new") // new | contacted | analyzed | site_generated | email_sent | replied | converted | non_interesse | closed_definitive
+  callStatus            String?  // to_call | callback | voicemail | reached | meeting_set | not_interested
+  nextCallAt            DateTime?
+  lastCallAt            DateTime?
+  emailStatus           String?  // to_send | sent | replied | bounced | not_needed
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  analysis      ProspectAnalysis?
+  generatedSite GeneratedSite?
+  emails        Email[]
+  events        ProspectEvent[]
+  proposals     Proposal[]
+
+  @@index([city])
+  @@index([sector])
+  @@index([status])
+  @@index([source])
+}
+
+model BrandProfile {
+  id            String   @id @default(cuid())
+  name          String
+  logoUrl       String?
+  primaryColor  String?
+  secondaryColor String?
+  accentColor   String?
+  fontGoogle    String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  proposals     Proposal[]
+}
+
+model Proposal {
+  id            String        @id @default(cuid())
+  title         String
+  prompt        String
+  htmlContent   String
+  pdfPath       String?
+  modelUsed     String?
+  slidesJson    String?
+  status        String        @default("draft") // draft | pdf_generated
+  prospectId    String?
+  prospect      Prospect?     @relation(fields: [prospectId], references: [id], onDelete: SetNull)
+  brandProfileId String
+  brandProfile  BrandProfile  @relation(fields: [brandProfileId], references: [id], onDelete: Cascade)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  versions      ProposalVersion[]
+
+  @@index([prospectId])
+  @@index([brandProfileId])
+}
+
+model ProposalVersion {
+  id          String   @id @default(cuid())
+  proposalId  String
+  proposal    Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  title       String
+  prompt      String
+  htmlContent String
+  modelUsed   String?
+  createdAt   DateTime @default(now())
+
+  @@index([proposalId])
+}
+
+model ProspectAnalysis {
+  id                      String   @id @default(cuid())
+  prospectId              String   @unique
+  prospect                Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  scoreGlobal             Int      @default(0)
+  hasWebsite              Boolean  @default(false)
+  websiteScorePerf        Int?
+  websiteScoreSeo         Int?
+  websiteScoreDesign      Int?
+  websiteScoreMobile      Int?
+  websiteScore            Int?
+  googleRating            Float?
+  googleReviewsCount      Int?
+  googleBusinessOptimized Boolean  @default(false)
+  socialPresence          String?  // JSON
+  servicesRecommended     String?  // JSON array
+  rawAnalysis             String?  // JSON
+  screenshotUrl           String?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
+model GeneratedSite {
+  id           String    @id @default(cuid())
+  prospectId   String    @unique
+  prospect     Prospect  @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  vercelUrl    String?
+  templateUsed String?
+  htmlContent  String
+  status       String    @default("draft") // draft | deployed | archived
+  deployedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Email {
+  id         String    @id @default(cuid())
+  prospectId String
+  prospect   Prospect  @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  subject    String
+  body       String
+  status     String    @default("draft") // draft | approved | sent | bounced | replied
+  sentAt     DateTime?
+  openedAt   DateTime?
+  clickedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([status])
+  @@index([prospectId])
+}
+
+model ProspectEvent {
+  id         String    @id @default(cuid())
+  prospectId String
+  prospect   Prospect  @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  type       String
+  message    String?
+  metadata   String?   // JSON
+  createdAt  DateTime  @default(now())
+
+  @@index([prospectId])
+  @@index([createdAt])
+}
+
+model ScrapingJob {
+  id           String    @id @default(cuid())
+  type         String    // google_places | pappers | pagejaunes | linkedin | google_search
+  params       String    // JSON
+  status       String    @default("pending") // pending | running | completed | failed
+  resultsCount Int       @default(0)
+  error        String?
+  startedAt    DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+}
+
+model Settings {
+  id    String @id @default("default")
+  key   String @unique
+  value String // JSON
+
+  @@index([key])
+}

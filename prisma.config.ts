@@ -3,12 +3,28 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+const isVercel = process.env.VERCEL === "1";
+const schema = process.env.PRISMA_SCHEMA
+  ? process.env.PRISMA_SCHEMA
+  : isVercel
+    ? "prisma/schema.postgres.prisma"
+    : "prisma/schema.prisma";
+
+const datasourceUrl =
+  process.env.DATABASE_URL ?? (isVercel ? undefined : "file:./dev.db");
+
+if (!datasourceUrl) {
+  throw new Error(
+    "DATABASE_URL is required (expected Postgres URL on Vercel).",
+  );
+}
+
 export default defineConfig({
-  schema: "prisma/schema.prisma",
+  schema,
   migrations: {
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    url: datasourceUrl,
   },
 });

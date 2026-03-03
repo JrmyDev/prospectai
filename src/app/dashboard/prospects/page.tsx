@@ -85,6 +85,7 @@ export default function ProspectsPage() {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [filterSource, setFilterSource] = useState("");
+  const [filterHasPhone, setFilterHasPhone] = useState("true");
   const [filterHasWebsite, setFilterHasWebsite] = useState("false");
   const [includeNonInterested, setIncludeNonInterested] = useState(false);
   const [includeClosed, setIncludeClosed] = useState(false);
@@ -93,6 +94,7 @@ export default function ProspectsPage() {
   const [filterEmailStatus, setFilterEmailStatus] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [analyzing, setAnalyzing] = useState<Set<string>>(new Set());
+  const [enriching, setEnriching] = useState(false);
 
   const fetchProspects = useCallback(async (page = 1) => {
     setLoading(true);
@@ -100,6 +102,7 @@ export default function ProspectsPage() {
     if (search) params.set("search", search);
     if (filterStatus) params.set("status", filterStatus);
     if (filterSource) params.set("source", filterSource);
+    if (filterHasPhone) params.set("hasPhone", filterHasPhone);
     if (filterHasWebsite) params.set("hasWebsite", filterHasWebsite);
     if (!filterStatus) {
       const exclude: string[] = [];
@@ -116,7 +119,7 @@ export default function ProspectsPage() {
     setProspects(data.prospects);
     setPagination(data.pagination);
     setLoading(false);
-  }, [search, filterStatus, filterSource, filterHasWebsite, includeNonInterested, includeClosed, filterCallStatus, filterCallbackDue, filterEmailStatus]);
+  }, [search, filterStatus, filterSource, filterHasPhone, filterHasWebsite, includeNonInterested, includeClosed, filterCallStatus, filterCallbackDue, filterEmailStatus]);
 
   useEffect(() => {
     fetchProspects();
@@ -157,6 +160,34 @@ export default function ProspectsPage() {
     await fetchProspects(pagination.page);
   };
 
+  const handleEnrichContacts = async () => {
+    const selectedIds = Array.from(selected);
+    const hasManualSelection = selectedIds.length > 0;
+
+    setEnriching(true);
+    try {
+      const res = await fetch("/api/prospects/enrich", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // If nothing is selected, enrich globally (server picks prospects missing phone/email).
+        body: JSON.stringify({
+          ids: hasManualSelection ? selectedIds : undefined,
+          limit: 100,
+          useGoogleFallback: false,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data?.error || "Erreur enrichissement");
+      } else {
+        alert(`Enrichissement terminé: ${data.updated} maj (${data.updatedPhone} tel, ${data.updatedEmail} email) sur ${data.processed} prospects traités.`);
+      }
+      await fetchProspects(pagination.page);
+    } finally {
+      setEnriching(false);
+    }
+  };
+
   const toggleSelect = (id: string) => {
     setSelected((prev) => {
       const next = new Set(prev);
@@ -193,6 +224,13 @@ export default function ProspectsPage() {
               Analyser ({selected.size})
             </button>
           )}
+          <button
+            onClick={handleEnrichContacts}
+            disabled={enriching}
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+          >
+            {enriching ? "Enrichissement..." : "Enrichir contacts (scraping)"}
+          </button>
           <span className="text-sm text-gray-400">{pagination.total} prospects</span>
         </div>
       </div>
@@ -230,6 +268,15 @@ export default function ProspectsPage() {
           <option value="google_search">Google Search</option>
           <option value="linkedin">LinkedIn</option>
           <option value="pagejaunes">PagesJaunes</option>
+        </select>
+        <select
+          value={filterHasPhone}
+          onChange={(e) => setFilterHasPhone(e.target.value)}
+          className="px-3 py-2 bg-gray-900 border border-gray-800 rounded-lg text-sm text-gray-300 focus:outline-none"
+        >
+          <option value="">Téléphone ?</option>
+          <option value="true">Avec téléphone</option>
+          <option value="false">Sans téléphone</option>
         </select>
         <select
           value={filterHasWebsite}

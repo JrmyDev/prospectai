@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Comparison Tool</title>
+<style>
+  body { margin: 0; background: #111; font-family: sans-serif; color: #fff; }
+  h1 { text-align: center; padding: 20px; font-size: 16px; }
+  .controls { text-align: center; margin-bottom: 20px; }
+  button { margin: 4px; padding: 8px 16px; cursor: pointer; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px; font-size: 13px; }
+  button:hover { background: #555; }
+  button.active { background: #4d79f5; border-color: #4d79f5; }
+  .slide-nav { text-align: center; margin-bottom: 20px; }
+  .compare-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0 20px 40px;
+  }
+  .panel { flex: 0 0 auto; }
+  .panel h2 { text-align: center; font-size: 13px; color: #aaa; margin-bottom: 8px; }
+  .ref-img { width: 1134px; height: 638px; display: block; border: 1px solid #333; }
+  .ref-img img { width: 100%; height: 100%; display: block; }
+  .slide-frame { border: 1px solid #333; width: 1134px; height: 638px; }
+  iframe { width: 1134px; height: 7018px; border: none; background: #eaeaea; margin-top: 0; }
+  .iframe-wrapper { 
+    width: 1134px; 
+    height: 638px; 
+    overflow: hidden;
+    position: relative;
+  }
+  .diff-overlay {
+    position: absolute;
+    inset: 0;
+    mix-blend-mode: difference;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<h1>PDF Reference vs HTML Reproduction — Comparison</h1>
+<div class="controls">
+  <span style="color:#aaa; font-size:13px; margin-right:12px;">Jump to slide:</span>
+  <button onclick="showSlide(1)" id="btn1">1</button>
+  <button onclick="showSlide(2)" id="btn2">2</button>
+  <button onclick="showSlide(3)" id="btn3">3</button>
+  <button onclick="showSlide(4)" id="btn4">4</button>
+  <button onclick="showSlide(5)" id="btn5">5</button>
+  <button onclick="showSlide(6)" id="btn6">6</button>
+  <button onclick="showSlide(7)" id="btn7">7</button>
+  <button onclick="showSlide(8)" id="btn8">8</button>
+  <button onclick="showSlide(9)" id="btn9">9</button>
+  <button onclick="showSlide(10)" id="btn10">10</button>
+  <button onclick="showSlide(11)" id="btn11">11</button>
+</div>
+
+<div id="all-slides">
+</div>
+
+<script>
+const slideGap = 638 + 24; // slide height + gap
+
+function showSlide(n) {
+  document.querySelectorAll('button[id^=btn]').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn' + n).classList.add('active');
+  
+  // Update iframe scroll position
+  const offset = (n - 1) * slideGap;
+  document.querySelector('iframe').style.marginTop = `-${offset}px`;
+  document.getElementById('ref-img').src = `proposition-cala/page${n}_ref.png`;
+  document.getElementById('slide-label').textContent = `Slide ${n} / 11`;
+}
+
+const container = document.getElementById('all-slides');
+container.innerHTML = `
+  <div class="compare-row">
+    <div class="panel">
+      <h2>PDF Original (reference)</h2>
+      <div class="ref-img"><img id="ref-img" src="proposition-cala/page1_ref.png" alt=""></div>
+    </div>
+    <div class="panel">
+      <h2>HTML Reproduction &nbsp;<span id="slide-label" style="color:#4d79f5">Slide 1 / 11</span></h2>
+      <div class="iframe-wrapper">
+        <iframe src="proposition-techvisor-lamaisondelacala.html" id="html-frame"></iframe>
+      </div>
+    </div>
+  </div>
+`;
+
+showSlide(1);
+</script>
+</body>
+</html>

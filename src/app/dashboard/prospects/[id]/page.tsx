@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft, Globe, MapPin, Phone, Mail, Star, Zap,
-  FileCode, Send, ExternalLink, Building2, Calendar, Eye,
+  FileCode, Send, ExternalLink, Building2, Calendar, Eye, GripVertical,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -81,6 +81,10 @@ export default function ProspectDetailPage() {
   const [callNotes, setCallNotes] = useState("");
   const [callNextAt, setCallNextAt] = useState("");
   const [noteText, setNoteText] = useState("");
+  const [mapFrameError, setMapFrameError] = useState(false);
+  const [mapPanelOpen, setMapPanelOpen] = useState(true);
+  const [mapPanelWidth, setMapPanelWidth] = useState(860);
+  const [resizingMapPanel, setResizingMapPanel] = useState(false);
 
   const fetchProspect = async () => {
     const res = await fetch(`/api/prospects/${id}`);
@@ -89,6 +93,14 @@ export default function ProspectDetailPage() {
   };
 
   useEffect(() => { fetchProspect(); }, [id]);
+  useEffect(() => { setMapFrameError(false); }, [id]);
+  useEffect(() => {
+    const onResize = () => {
+      setMapPanelWidth((prev) => Math.min(prev, Math.max(480, window.innerWidth - 80)));
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   const handleAction = async (action: string) => {
     setActionLoading(action);
@@ -237,6 +249,21 @@ export default function ProspectDetailPage() {
     phoneScript = "";
   }
 
+  const mapQuery = [prospect.company, prospect.address, prospect.postalCode, prospect.city]
+    .filter(Boolean)
+    .join(", ");
+  const mapOpenUrl = prospect.googleMapsUrl
+    ? prospect.googleMapsUrl
+    : mapQuery
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`
+    : null;
+  const mapPanelUrl = mapOpenUrl;
+  const mapEmbedUrl = buildGoogleMapsEmbedUrl(mapOpenUrl, mapQuery);
+  const updateMapPanelWidth = (clientX: number) => {
+    const nextWidth = Math.min(1400, Math.max(480, window.innerWidth - clientX));
+    setMapPanelWidth(nextWidth);
+  };
+
   const ScoreBar = ({ label, value }: { label: string; value: number | null }) => (
     <div className="space-y-1">
       <div className="flex justify-between text-xs">
@@ -257,7 +284,7 @@ export default function ProspectDetailPage() {
   );
 
   return (
-    <div>
+    <div className="relative">
       {/* Header */}
       <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-400 hover:text-white mb-4 transition-colors">
         <ArrowLeft className="w-4 h-4" /> Retour
@@ -704,6 +731,115 @@ export default function ProspectDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Side panel Google Maps */}
+      {mapPanelUrl && (
+        <>
+          {mapPanelOpen ? (
+            <aside
+              className="hidden lg:flex fixed top-3 right-3 bottom-3 z-40 border border-gray-700 rounded-xl bg-gray-950 shadow-2xl overflow-hidden"
+              style={{ width: `${mapPanelWidth}px` }}
+            >
+              <button
+                onPointerDown={(event) => {
+                  event.preventDefault();
+                  event.currentTarget.setPointerCapture(event.pointerId);
+                  setResizingMapPanel(true);
+                  updateMapPanelWidth(event.clientX);
+                }}
+                onPointerMove={(event) => {
+                  if (!resizingMapPanel) return;
+                  updateMapPanelWidth(event.clientX);
+                }}
+                onPointerUp={(event) => {
+                  if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+                    event.currentTarget.releasePointerCapture(event.pointerId);
+                  }
+                  setResizingMapPanel(false);
+                }}
+                onPointerCancel={(event) => {
+                  if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+                    event.currentTarget.releasePointerCapture(event.pointerId);
+                  }
+                  setResizingMapPanel(false);
+                }}
+                className="w-4 shrink-0 bg-gray-900 hover:bg-gray-800 cursor-col-resize border-r border-gray-800 flex items-center justify-center touch-none"
+                title="Redimensionner le panneau"
+                aria-label="Redimensionner le panneau"
+              >
+                <GripVertical className="w-3 h-3 text-gray-500" />
+              </button>
+              <div className="flex-1 flex flex-col min-w-0">
+                <div className="h-11 px-3 border-b border-gray-800 bg-gray-900 flex items-center justify-between">
+                  <div className="text-xs uppercase tracking-wide text-gray-400">Google Maps</div>
+                  <div className="flex items-center gap-2">
+                    <a
+                      href={mapPanelUrl}
+                      target="_blank"
+                      rel="noopener"
+                      className="text-xs px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-blue-300 rounded-lg flex items-center gap-1"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      Ouvrir
+                    </a>
+                    <button
+                      onClick={() => setMapPanelOpen(false)}
+                      className="text-xs px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg"
+                    >
+                      Masquer
+                    </button>
+                  </div>
+                </div>
+                {!mapFrameError && mapEmbedUrl ? (
+                  <iframe
+                    title={`Google Maps ${prospect.company}`}
+                    src={mapEmbedUrl}
+                    className="w-full h-full bg-white"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    onError={() => setMapFrameError(true)}
+                  />
+                ) : (
+                  <div className="p-4 text-sm text-gray-400">
+                    Google bloque l&apos;affichage des pages Maps complètes en iframe (X-Frame-Options).
+                    Utilise le bouton <span className="text-gray-200">Ouvrir</span> pour la vue complète.
+                  </div>
+                )}
+              </div>
+            </aside>
+          ) : (
+            <button
+              onClick={() => setMapPanelOpen(true)}
+              className="hidden lg:flex fixed top-3 right-3 z-40 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm text-gray-200 hover:bg-gray-800"
+            >
+              Afficher Google Maps
+            </button>
+          )}
+        </>
+      )}
     </div>
   );
+}
+
+function buildGoogleMapsEmbedUrl(
+  mapOpenUrl: string | null,
+  mapQuery: string
+): string | null {
+  if (!mapOpenUrl && !mapQuery) return null;
+
+  // Free embeddable format (no paid Maps Embed API key required).
+  if (!mapOpenUrl) {
+    return `https://www.google.com/maps?output=embed&q=${encodeURIComponent(mapQuery)}`;
+  }
+
+  try {
+    const u = new URL(mapOpenUrl);
+    if (!u.hostname.includes("google.")) {
+      return `https://www.google.com/maps?output=embed&q=${encodeURIComponent(mapQuery || mapOpenUrl)}`;
+    }
+    u.searchParams.set("output", "embed");
+    return u.toString();
+  } catch {
+    return `https://www.google.com/maps?output=embed&q=${encodeURIComponent(mapQuery || mapOpenUrl)}`;
+  }
 }

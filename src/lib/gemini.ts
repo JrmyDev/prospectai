@@ -35,15 +35,19 @@ export async function generateText(
   return response.text || "";
 }
 
-export async function generateJson<T>(prompt: string, systemInstruction?: string): Promise<T> {
+export async function generateJson<T>(
+  prompt: string,
+  systemInstruction?: string,
+  options?: GenerateTextOptions
+): Promise<T> {
   const ai = await getGemini();
   const response = await ai.models.generateContent({
-    model: "gemini-3-pro-preview",
+    model: options?.model ?? "gemini-3-pro-preview",
     contents: prompt,
     config: {
       systemInstruction: systemInstruction || "Tu es un expert en marketing digital et prospection commerciale B2B en France. Réponds UNIQUEMENT en JSON valide, sans markdown.",
-      temperature: 0.3,
-      maxOutputTokens: 4096,
+      temperature: options?.temperature ?? 0.3,
+      maxOutputTokens: options?.maxOutputTokens ?? 4096,
       responseMimeType: "application/json",
     },
   });
