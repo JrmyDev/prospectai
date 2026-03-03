@@ -13,11 +13,13 @@ import {
   Zap,
   FileText,
   Palette,
+  Phone,
 } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard", label: "Vue d'ensemble", icon: LayoutDashboard },
   { href: "/dashboard/prospects", label: "Prospects", icon: Users },
+  { href: "/dashboard/call-queue", label: "Call Queue", icon: Phone },
   { href: "/dashboard/scraping", label: "Scraping", icon: Search },
   { href: "/dashboard/emails", label: "Emails", icon: Mail },
   { href: "/dashboard/branding", label: "Branding", icon: Palette },
